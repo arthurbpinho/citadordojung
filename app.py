@@ -4,13 +4,24 @@ import os
 
 
 def get_api_key():
-    # Streamlit Cloud (secrets) ou .env local
+    # 1. Streamlit Cloud secrets
     try:
-        return st.secrets["OPENAI_API_KEY"]
+        key = st.secrets.get("OPENAI_API_KEY", None)
+        if key:
+            return key
     except Exception:
+        pass
+    # 2. Variável de ambiente
+    key = os.environ.get("OPENAI_API_KEY", None)
+    if key:
+        return key
+    # 3. .env local
+    try:
         from dotenv import load_dotenv
         load_dotenv()
-        return os.getenv("OPENAI_API_KEY")
+        return os.environ.get("OPENAI_API_KEY", None)
+    except Exception:
+        return None
 
 
 MODEL = "gpt-4o"
