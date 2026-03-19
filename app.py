@@ -13,8 +13,13 @@ def get_api_key():
         return os.getenv("OPENAI_API_KEY")
 
 
-client = OpenAI(api_key=get_api_key())
 MODEL = "gpt-4o"
+
+
+def get_client():
+    if "openai_client" not in st.session_state:
+        st.session_state.openai_client = OpenAI(api_key=get_api_key())
+    return st.session_state.openai_client
 
 SYSTEM_PROMPT = """Você é um pesquisador sênior em psicologia analítica com domínio profundo das Obras Completas de C.G. Jung (Collected Works, volumes I–XX).
 
@@ -36,7 +41,7 @@ Fluxo de trabalho:
 
 
 def chat(messages: list) -> str:
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model=MODEL,
         messages=messages,
         temperature=0.5,
@@ -64,7 +69,7 @@ Estrutura sugerida:
 TEXTO FINAL:
 {text}"""
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.6,
@@ -93,7 +98,7 @@ Diretrizes:
 TEXTO FINAL:
 {text}"""
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.6,
